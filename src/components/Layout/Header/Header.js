@@ -10,7 +10,7 @@ const Header = ({onShowCart}) => {
                 <HeaderCartButton onClick={onShowCart}/>
             </header>
             <div>
-                <img className={styles['main-image']} src={mealsImage}/>
+                <img className={styles['main-image']} src={mealsImage} alt="/" />
             </div>
         </>
     );

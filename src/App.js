@@ -1,8 +1,8 @@
 import './App.css';
-import './components/Layout/Header/Header';
 import Header from './components/Layout/Header/Header';
 import Meals from './components/Meals/Meals';
 import Cart from './components/Cart/Cart';
+import CartContextProvider from './store/CartContextProvider';
 import {useState} from 'react';
 
 function App() {
@@ -11,9 +11,11 @@ function App() {
 
   return (
     <>
-      <Header onShowCart={setCartOpen}/>
-      <Meals />
-      {cartOpen && <Cart onClose={setCartOpen}/>}
+      <CartContextProvider>
+        <Header onShowCart={setCartOpen}/>
+        <Meals />
+        {cartOpen && <Cart onClose={setCartOpen}/>}
+      </CartContextProvider>
     </>
   );
 }
