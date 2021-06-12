@@ -1,11 +1,14 @@
 import styles from './Cart.module.css';
 import Modal from '../UI/Modal';
 import CartItem from './CartItem';
-import {useContext} from 'react';
+import {useContext, useState} from 'react';
 import CartContext from '../../store/cart-context';
+import Checkout from './Checkout';
 
 const Cart = ({onClose}) => {
 
+    const [isCheckout, setIsCheckout] = useState(false);
+    const [didSubmit, setDidSubmit] = useState(false);
     const cartCtx = useContext(CartContext);
 
     const totalAmount = `ZAR ${cartCtx.totalAmount.toFixed(2)}`;
@@ -22,6 +25,14 @@ const Cart = ({onClose}) => {
         });
     };
 
+    const orderHandler = () => {
+        setIsCheckout(true);
+    };
+
+    const cancelOrderHandler = () => {
+        setIsCheckout(false);
+    };
+
     const cartItems = cartCtx.items.map(item => 
         <CartItem 
             key={item.id}
@@ -33,6 +44,15 @@ const Cart = ({onClose}) => {
         />
     );
 
+    const modalActions = (
+        !isCheckout && (
+            <div className={styles.actions}>
+                <button className={styles['button--alt']} onClick={() => onClose(false)}>Close</button>
+                {hasItems && <button className={styles.button} onClick={orderHandler}>Order</button>}
+            </div>
+        )
+    );
+
     return (
         <Modal onClickBackdrop={onClose}>
             <ul className={styles['cart-items']}>{cartItems}</ul>
@@ -40,10 +60,8 @@ const Cart = ({onClose}) => {
                 <span>Total Amount</span>
                 <span>{totalAmount}</span>
             </div>
-            <div className={styles.actions}>
-                <button className={styles['button--alt']} onClick={() => onClose(false)}>Close</button>
-                {hasItems && <button className={styles.button}>Order</button>}
-            </div>
+            {isCheckout && <Checkout onCancel={cancelOrderHandler} onSubmit={didSubmit} />}
+            {modalActions}
         </Modal>
     );
 };

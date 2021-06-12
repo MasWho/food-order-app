@@ -1,43 +1,65 @@
+import { useState, useEffect } from "react";
 import styles from "./AvailableMeals.module.css";
 import Card from "../UI/Card";
 import MealItem from "./MealItem/MealItem";
-
-const DUMMY_MEALS = [
-	{
-		id: "m1",
-		name: "Sushi",
-		description: "Finest fish and veggies",
-		price: 22.99,
-	},
-	{
-		id: "m2",
-		name: "Schnitzel",
-		description: "A german specialty!",
-		price: 16.5,
-	},
-	{
-		id: "m3",
-		name: "Barbecue Burger",
-		description: "American, raw, meaty",
-		price: 12.99,
-	},
-	{
-		id: "m4",
-		name: "Green Bowl",
-		description: "Healthy...and green...",
-		price: 18.99,
-	},
-];
+import useHttp from "../../hooks/use-http";
+import Spinner from "../../components/UI/Spinner";
 
 const AvailableMeals = () => {
+	const [meals, setMeals] = useState();
+
+	const { loading, error, sendRequest } = useHttp();
+
+	useEffect(() => {
+		const transformMealsData = (data) => {
+			let mealsArray = Object.keys(data).map((id) => {
+				return {
+					id: id,
+					name: data[id].name,
+					description: data[id].description,
+					price: data[id].price,
+				};
+			});
+			setMeals(mealsArray);
+		};
+
+		sendRequest({ url: "https://react-hook-update-74a30-default-rtdb.europe-west1.firebasedatabase.app/meals.json" }, transformMealsData);
+	}, [sendRequest]);
+
+	let content;
+	
+	if(meals && meals.length && !loading) {
+		content = (
+			<ul>
+				{
+					meals.map(meal => 
+						<MealItem 
+							name={meal.name} 
+							key={meal.id} 
+							id={meal.id} 
+							description={meal.description} 
+							price={meal.price} 
+						/>
+					)
+				}
+			</ul>
+		);
+	}
+
+	if(error) {
+		content = (
+			<p style={{textAlign: 'center'}}>{error}</p>
+		);
+	}
+
+	if(loading) {
+		content = <Spinner />;
+	}
+
 	return (
 		<section className={styles.meals}>
 			<Card>
-				<ul>
-					{DUMMY_MEALS.map((meal) => (
-						<MealItem name={meal.name} key={meal.id} id={meal.id} description={meal.description} price={meal.price} />
-					))}
-				</ul>
+				{content}
 			</Card>
 		</section>
 	);
